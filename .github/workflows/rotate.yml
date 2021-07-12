@@ -1,0 +1,36 @@
+name: Rotate backup config
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "10 4 3 * *"
+
+jobs:
+  twdel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      -name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      - name: Rotate
+        run: mv backup.json.enc backup_${{ steps.date.outputs.date }}.json.enc
+      - name: Setup git
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        run: |
+          git config --local user.name GitHubActions
+          git remote set-url origin https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+      - name: Git push
+        run: |
+          git checkout main
+          git pull origin main
+          git add -A
+          DIFF=`git diff --cached --numstat | wc -l`
+          if [ $DIFF -eq 0 ]; then
+            exit 0
+          fi
+          git commit -am 'GitHub Actions commit' --allow-empty
+          git push origin main
