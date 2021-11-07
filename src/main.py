@@ -27,6 +27,7 @@ try:
 except FileNotFoundError:
     pass
 delete_count = 0
+last_tweet_text = ""
 for tweet in tweets:
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
     if tweet.created_at < before_two_days:
@@ -34,10 +35,14 @@ for tweet in tweets:
         # print(tweet.created_at, tweet.text)
         api.destroy_status(tweet.id)
         delete_count += 1
+        last_tweet_text = tweet.text
 
 with open("backup.json", "w") as f:
     f.write(json.dumps(backup))
 aes.encrypt_file("backup.json", delete_raw_file=True)
 
 if delete_count != 0:
-    api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")
+    if delete_count == 1 and last_tweet_text.startswith("Deleted and encrypted backup of"):
+        print("Only Deleted and encrypted backup of...")
+    else:
+        api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")
