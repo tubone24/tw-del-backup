@@ -28,7 +28,7 @@ except FileNotFoundError:
     pass
 delete_count = 0
 latest_tweet_text = ""
-if len(tweets) > 0:
+if len(tweets.count()) > 0:
     latest_tweet_text = tweets[0]
 for tweet in tweets:
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
