@@ -29,6 +29,7 @@ except FileNotFoundError:
 delete_count = 0
 last_tweet_text = ""
 for tweet in tweets:
+    print(tweet.created_at, tweet.text)
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
     if tweet.created_at < before_two_days:
         backup.append(tweet._json)
