@@ -1,2 +1,2 @@
-tweepy==3.10.0
+tweepy==4.10.0
 pycryptodome==3.12.0
