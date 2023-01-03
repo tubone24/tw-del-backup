@@ -37,7 +37,7 @@ for tweet in tweets:
         print(tweet.created_at, tweet.id_str)
         print(tweet._json)
         print(type(tweet._json))
-        save_tweet_media(json.loads(tweet._json.decode("utf-8")), BACKUP_KEY)
+        save_tweet_media(tweet._json, BACKUP_KEY)
         # api.destroy_status(tweet.id)
         delete_count += 1
 
