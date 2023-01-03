@@ -42,16 +42,16 @@ for tweet in tweets:
     if tweet.created_at < before_two_days:
         backup.append(tweet._json)
         print(tweet.created_at, tweet.id_str)
-#         save_tweet_media(tweet._json, BACKUP_KEY)
-#         api.destroy_status(tweet.id)
-#         delete_count += 1
+        save_tweet_media(tweet._json, BACKUP_KEY)
+        api.destroy_status(tweet.id)
+        delete_count += 1
 
-# with open("backup.json", "w") as f:
-#     f.write(json.dumps(backup))
-# aes.encrypt_file("backup.json", delete_raw_file=True)
+with open("backup.json", "w") as f:
+    f.write(json.dumps(backup))
+aes.encrypt_file("backup.json", delete_raw_file=True)
 
-# if delete_count != 0:
-#     if delete_count == 1 and first_tweet_text.startswith("Deleted and encrypted backup of"):
-#         print("Only Deleted and encrypted backup of...")
-#     else:
-#         api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")
+if delete_count != 0:
+    if delete_count == 1 and first_tweet_text.startswith("Deleted and encrypted backup of"):
+        print("Only Deleted and encrypted backup of...")
+    else:
+        api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")
