@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from encrypt import AESCipher
+from save_media import save_tweet_media
 CONSUMER_KEY = os.getenv("CONSUMER_KEY")
 CONSUMER_SECRET = os.getenv("CONSUMER_SECRET")
 ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
@@ -33,7 +34,8 @@ for tweet in tweets:
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
     if tweet.created_at < before_two_days:
         backup.append(tweet._json)
-        # print(tweet.created_at, tweet.text)
+        print(tweet.created_at, tweet.id_str)
+        save_tweet_media(tweet, BACKUP_KEY)
         api.destroy_status(tweet.id)
         delete_count += 1
 

@@ -36,6 +36,17 @@ class AESCipher(object):
         data = Padding.pad(raw_text.encode("utf-8"), AES.block_size, "pkcs7")
         return base64.b64encode(initialization_vector + cipher.encrypt(data))
 
+    def encrypt_bytes(self, filepath, delete_raw_file=False):
+        initialization_vector = Random.get_random_bytes(AES.block_size)
+        cipher = AES.new(self.key, AES.MODE_EAX, initialization_vector)
+        with open(filepath, "rb") as f1, open(filepath + ".enc", "wb") as f2:
+            raw_byte = f1.read()
+            pad = lambda s: s + ((AES.block_size - len(s) % AES.block_size) * chr(AES.block_size - len(s) %AES.block_size)).encode('utf-8')
+            encrypted = initialization_vector + cipher.encrypt(pad(raw_byte))
+            f2.write(encrypted)
+            if delete_raw_file:
+                os.remove(filepath)
+
     def decrypt(self, encrypted):
         encrypted = base64.b64decode(encrypted)
         iv = encrypted[: AES.block_size]
@@ -44,6 +55,19 @@ class AESCipher(object):
             cipher.decrypt(encrypted[AES.block_size :]), AES.block_size, "pkcs7"
         )
         return data.decode("utf-8")
+    
+    def decrypt_bytes(self, filepath, delete_raw_file=False):
+        with open(filepath, "rb") as f1, open(filepath.replace(".enc", ""), "wb") as f2:
+            encrypted = f1.read()
+            iv = encrypted[: AES.block_size]
+            encrypted_data = encrypted[AES.block_size:]
+            cipher = AES.new(self.key, AES.MODE_EAX, iv)
+            decrypted_data = cipher.decrypt(encrypted_data)
+            unpad = lambda s: s[0:-s[-1]]
+            raw_data = unpad(decrypted_data)
+            f2.write(raw_data);
+            if delete_raw_file:
+                os.remove(filepath)
 
     def encrypt_file(self, path, delete_raw_file=False):
         with open(path, "r") as f1, open(path + ".enc", "wb") as f2:
