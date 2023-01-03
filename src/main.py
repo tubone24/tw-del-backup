@@ -1,5 +1,6 @@
 import tweepy
 import json
+import toml
 import os
 from datetime import datetime, timedelta
 from encrypt import AESCipher
@@ -21,6 +22,9 @@ account = api.me()
 tweets = tweepy.Cursor(api.user_timeline, id=account.id).items(100000)
 aes = AESCipher(key=BACKUP_KEY)
 backup = []
+
+config = toml.load(open("config.toml"))
+
 try:
     aes.decrypt_file("backup.json.enc", delete_raw_file=True)
     with open("backup.json", "r+") as f:
@@ -30,21 +34,24 @@ except FileNotFoundError:
 delete_count = 0
 first_tweet_text = ""
 for tweet in tweets:
+    if tweet.id_str in config["delete_ignore"]["ids"]:
+        print(f"{tweet.id_str} is delete ignore tweet")
+        continue
     first_tweet_text = tweet.text
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
     if tweet.created_at < before_two_days:
         backup.append(tweet._json)
         print(tweet.created_at, tweet.id_str)
-        save_tweet_media(tweet._json, BACKUP_KEY)
-        api.destroy_status(tweet.id)
-        delete_count += 1
+#         save_tweet_media(tweet._json, BACKUP_KEY)
+#         api.destroy_status(tweet.id)
+#         delete_count += 1
 
-with open("backup.json", "w") as f:
-    f.write(json.dumps(backup))
-aes.encrypt_file("backup.json", delete_raw_file=True)
+# with open("backup.json", "w") as f:
+#     f.write(json.dumps(backup))
+# aes.encrypt_file("backup.json", delete_raw_file=True)
 
-if delete_count != 0:
-    if delete_count == 1 and first_tweet_text.startswith("Deleted and encrypted backup of"):
-        print("Only Deleted and encrypted backup of...")
-    else:
-        api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")
+# if delete_count != 0:
+#     if delete_count == 1 and first_tweet_text.startswith("Deleted and encrypted backup of"):
+#         print("Only Deleted and encrypted backup of...")
+#     else:
+#         api.update_status(f"Deleted and encrypted backup of {delete_count} Twitter posts from {BEFORE_DAYS} days ago. {GITHUB_ACTIONS_URL}")

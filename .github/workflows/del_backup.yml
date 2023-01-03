@@ -32,7 +32,7 @@ jobs:
           BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
           CONSUMER_KEY: ${{ secrets.CONSUMER_KEY }}
           CONSUMER_SECRET: ${{ secrets.CONSUMER_SECRET }}
-          BEFORE_DAYS: "7"
+          BEFORE_DAYS: "6"
         run: python3 src/main.py
       - name: Setup git
         env:
