@@ -33,10 +33,11 @@ for tweet in tweets:
     first_tweet_text = tweet.text
     before_two_days = datetime.now() - timedelta(days=BEFORE_DAYS)
     if tweet.created_at < before_two_days:
+        print(tweet)
         backup.append(tweet._json)
         print(tweet.created_at, tweet.id_str)
         save_tweet_media(tweet, BACKUP_KEY)
-        api.destroy_status(tweet.id)
+        # api.destroy_status(tweet.id)
         delete_count += 1
 
 with open("backup.json", "w") as f:
