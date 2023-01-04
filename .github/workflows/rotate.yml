@@ -11,9 +11,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get current date
         id: date
-        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+        run: |
+          echo "year=$(date +'%Y')" >> $GITHUB_OUTPUT
+          echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
       - name: Rotate
-        run: mv backup.json.enc backup_${{ steps.date.outputs.date }}.json.enc
+        run: |
+          mkdir -p archives/${{ steps.date.outputs.year }}
+          mv backup.json.enc archives/${{ steps.date.outputs.year }}/backup_${{ steps.date.outputs.date }}.json.enc
       - name: Setup git
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
